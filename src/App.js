@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-
+// import Quiz from "./Quiz";
 function App() {
-  //   const [startQuiz, setStartQuiz] = useState(false);
   const [questions, setQuestions] = useState([]);
-
+  const [options, setOptions] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [showScore, setShowScore] = useState(false);
+  const [score, setScore] = useState(0);
   useEffect(() => {
     fetch(
       "https://opentdb.com/api.php?amount=10&category=10&difficulty=medium&type=multiple"
@@ -11,16 +13,55 @@ function App() {
       .then((res) => res.json())
       .then((res) => setQuestions(res.results));
   }, []);
+
+  const updateQuestions = (selectedOption) => {
+    if (selectedOption == questions[currentQuestion].correct_answer) {
+      setScore(score + 1);
+    }
+
+    const nextQuestion = currentQuestion + 1;
+    if (nextQuestion < questions.length) {
+      setCurrentQuestion(nextQuestion);
+    } else {
+      setShowScore(true);
+    }
+  };
+
+  if (questions.length === 0) {
+    return "Loading...";
+  }
+  console.log("Questions==>>", questions);
+
   return (
     <div>
-      <h1>Quiz Application</h1>
-      <p>
-        This is a quiz on the topic of Entertainment . There are 10 multiple
-        choice questions questions in this quiz. Passing criteria of the quiz is
-        50%.
-      </p>
+      {showScore ? (
+        <span>
+          Your scored {score} out of {questions.length}
+        </span>
+      ) : (
+        <>
+          <div className='question-section'>
+            <div className='question-count'>
+              <span>Question {currentQuestion + 1}</span> / {questions.length}
+            </div>
+            <div className='question-text'>
+              {questions[currentQuestion].question}
+            </div>
+          </div>
 
-      <button>Start Quiz</button>
+          <div className='answer-section'>
+            {questions[currentQuestion].incorrect_answers.map((value) => {
+              return (
+                <div>
+                  <button onClick={() => updateQuestions(value)}>
+                    {value}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }
