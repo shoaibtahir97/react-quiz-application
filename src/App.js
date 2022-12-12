@@ -32,6 +32,18 @@ function App() {
   }
   console.log("Questions==>>", questions);
 
+  let incorrect_options = questions.map((value) => {
+    return value.incorrect_answers;
+    return;
+  });
+
+  let correct_options = questions.map((value) => {
+    return value.correct_answer;
+  });
+
+  for (let i = 0; i < incorrect_options.length; i++) {
+    incorrect_options[i].push(correct_options[i]);
+  }
   return (
     <div>
       {showScore ? (
